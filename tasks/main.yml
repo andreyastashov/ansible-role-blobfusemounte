@@ -1,0 +1,60 @@
+- name: install https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb package
+  apt:
+    deb: https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb
+    state: present
+    update_cache: yes
+  tags: [packages]
+- name: install libfuse3-dev fuse3 blobfuse2 packages
+  apt:
+    name:
+      - libfuse3-dev
+      - fuse3
+      - blobfuse2
+    state: present
+    update_cache: yes
+  tags: [packages]
+- name: Template blobfuse2 config file
+  template:
+    src: config.yaml.j2
+    dest: /usr/share/blobfuse2/config.yaml
+    owner: root
+    mode: 0644
+  tags: [blobfuse2]
+- name: change /etc/fuse.conf to uncomment user_allow_other line
+  lineinfile:
+    path: /etc/fuse.conf
+    regexp: "^#user_allow_other"
+    line: "user_allow_other"
+    state: present
+    create: no
+  tags: [blobfuse2]
+- name: create blobfuse2 mounting point
+  file:
+    path: "{{ blobfuse2_mounting_point }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  tags: [blobfuse2]
+- name: create /etc/systemd/system/blobfuse2.service file
+  template:
+    src: blobfuse2.service.j2
+    dest: /etc/systemd/system/blobfuse2.service
+    owner: root
+    mode: 0644
+  notify:
+    - systemctl daemon-reload
+    - restart blobfuse2 service
+    - start blobfuse2 service
+  tags: [blobfuse2]
+- name: create /etc/default/blobfuse2 file
+  template:
+    src: blobfuse2.j2
+    dest: /etc/default/blobfuse2
+    owner: root
+    mode: 0640
+  tags: [blobfuse2]
+  notify:
+    - systemctl daemon-reload
+    - restart blobfuse2 service
+    - start blobfuse2 service

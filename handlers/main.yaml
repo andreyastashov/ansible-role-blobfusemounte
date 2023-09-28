@@ -1,0 +1,15 @@
+---
+- name: start blobfuse2 service
+  service:
+    name: blobfuse2
+    state: started
+    enabled: yes
+
+- name: restart blobfuse2 service
+  service:
+    name: blobfuse2
+    state: restarted
+
+- name: systemctl daemon-reload
+  command: systemctl daemon-reload # noqa 305
+
