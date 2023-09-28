@@ -6,7 +6,7 @@ Requires=network-online.targe
 [Service]
 User=root
 Group=root
-EnvironmentFile=-/etc/default/blobfuse2
+EnvironmentFile=/etc/default/blobfuse2
 Type=forking
 ExecStart=/usr/bin/blobfuse2 mount {{ blobfuse2_mounting_point }} --config-file=/usr/share/blobfuse2/config.yaml  --ignore-open-flags
 ExecStop=/usr/bin/blobfuse2 unmount all
